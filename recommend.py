@@ -54,9 +54,10 @@ def group_by_centroid(restaurants, centroids):
 
 def find_centroid(cluster):
     """Return the centroid of the locations of the restaurants in cluster."""
-    # BEGIN Question 5
-    "*** REPLACE THIS LINE ***"
-    # END Question 5
+    lat = [restaurant_location(i)[0] for i in cluster]
+    lon = [restaurant_location(i)[1] for i in cluster]
+
+    return [mean(lat),mean(lon)] 
 
 
 def k_means(restaurants, k, max_updates=100):
@@ -68,9 +69,11 @@ def k_means(restaurants, k, max_updates=100):
 
     while old_centroids != centroids and n < max_updates:
         old_centroids = centroids
-        # BEGIN Question 6
-        "*** REPLACE THIS LINE ***"
-        # END Question 6
+        clusters = group_by_centroid(restaurants,centroids)
+        new_centroid = []
+        for i in clusters:
+            new_centroid.append(find_centroid(i))
+        centroids = new_centroid
         n += 1
     return centroids
 
@@ -96,11 +99,37 @@ def find_predictor(user, restaurants, feature_fn):
     xs = [feature_fn(r) for r in restaurants]
     ys = [reviews_by_user[restaurant_name(r)] for r in restaurants]
 
-    # BEGIN Question 7
-    "*** REPLACE THIS LINE ***"
+    
     b, a, r_squared = 0, 0, 0  # REPLACE THIS LINE WITH YOUR SOLUTION
-    # END Question 7
+    # x = price, y = rating
 
+    
+    mean_prices = mean(xs)
+    mean_ratings = mean(ys)
+
+    diff_squares = lambda x: [pow(i,2) for i in x]
+
+    S_xx_list_no_square = [i-mean_prices for i in xs]
+    S_xx_list = diff_squares(S_xx_list_no_square) 
+    S_xx = sum(S_xx_list)
+
+    S_yy_list_no_square = [i-mean_ratings for i in ys]
+    S_yy_list = diff_squares(S_yy_list_no_square)
+    S_yy = sum(S_yy_list)
+
+
+    S_xy_list = zip(S_xx_list_no_square,S_yy_list_no_square)
+
+    S_xy_list = [i[0]*i[1] for i in S_xy_list]
+
+    S_xy = sum(S_xy_list)
+
+   
+
+    b= S_xy / S_xx
+    a = mean_ratings - b*mean_prices
+    r_squared = pow(S_xy,2)/(S_xx * S_yy)
+    
     def predictor(restaurant):
         return b * feature_fn(restaurant) + a
 
@@ -145,9 +174,13 @@ def search(query, restaurants):
     query -- A string
     restaurants -- A sequence of restaurants
     """
-    # BEGIN Question 10
-    "*** REPLACE THIS LINE ***"
-    # END Question 10
+    result_of_query = []
+    for i in restaurants:
+        for j in restaurant_categories(i):
+            if query == j:
+                result_of_query.append(i)
+                
+    return result_of_query
 
 
 def feature_set():

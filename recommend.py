@@ -154,7 +154,12 @@ def best_predictor(user, restaurants, feature_fns):
     """
     reviewed = user_reviewed_restaurants(user, restaurants)
     # BEGIN Question 8
-    "*** REPLACE THIS LINE ***"
+    r_squareds = {}
+    for fn in feature_fns:
+        pred, r_2 = find_predictor(user, reviewed, fn)
+        r_squareds[pred] = r_2
+
+    return max(r_squareds, key=r_squareds.get)
     # END Question 8
 
 
@@ -170,7 +175,9 @@ def rate_all(user, restaurants, feature_fns):
     predictor = best_predictor(user, ALL_RESTAURANTS, feature_fns)
     reviewed = user_reviewed_restaurants(user, restaurants)
     # BEGIN Question 9
-    "*** REPLACE THIS LINE ***"
+    b_pred = best_predictor(user, ALL_RESTAURANTS, feature_fns)
+    return {restaurant_name(r): (user_rating(user, restaurant_name(r)) if r in reviewed else b_pred(r)) for r in restaurants}
+
     # END Question 9
 
 

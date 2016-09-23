@@ -19,7 +19,10 @@ def find_closest(location, centroids):
     [2.0, 3.0]
     """
     # BEGIN Question 3
-    "*** REPLACE THIS LINE ***"
+    dic = {}
+    for i in range(len(centroids)):
+        dic[i] = distance(centroids[i], location)
+    return centroids[min(dic, key = dic.get)]
     # END Question 3
 
 
@@ -48,7 +51,11 @@ def group_by_centroid(restaurants, centroids):
     restaurants closest to the same centroid.
     """
     # BEGIN Question 4
-    "*** REPLACE THIS LINE ***"
+    pairs = []
+    for r in restaurants:
+        closest = find_closest(restaurant_location(r), centroids)
+        pairs += [[closest, r]]
+    return group_by_first(pairs)
     # END Question 4
 
 
@@ -57,7 +64,7 @@ def find_centroid(cluster):
     lat = [restaurant_location(i)[0] for i in cluster]
     lon = [restaurant_location(i)[1] for i in cluster]
 
-    return [mean(lat),mean(lon)] 
+    return [mean(lat),mean(lon)]
 
 
 def k_means(restaurants, k, max_updates=100):
@@ -99,18 +106,18 @@ def find_predictor(user, restaurants, feature_fn):
     xs = [feature_fn(r) for r in restaurants]
     ys = [reviews_by_user[restaurant_name(r)] for r in restaurants]
 
-    
+
     b, a, r_squared = 0, 0, 0  # REPLACE THIS LINE WITH YOUR SOLUTION
     # x = price, y = rating
 
-    
+
     mean_prices = mean(xs)
     mean_ratings = mean(ys)
 
     diff_squares = lambda x: [pow(i,2) for i in x]
 
     S_xx_list_no_square = [i-mean_prices for i in xs]
-    S_xx_list = diff_squares(S_xx_list_no_square) 
+    S_xx_list = diff_squares(S_xx_list_no_square)
     S_xx = sum(S_xx_list)
 
     S_yy_list_no_square = [i-mean_ratings for i in ys]
@@ -124,12 +131,12 @@ def find_predictor(user, restaurants, feature_fn):
 
     S_xy = sum(S_xy_list)
 
-   
+
 
     b= S_xy / S_xx
     a = mean_ratings - b*mean_prices
     r_squared = pow(S_xy,2)/(S_xx * S_yy)
-    
+
     def predictor(restaurant):
         return b * feature_fn(restaurant) + a
 
@@ -179,7 +186,7 @@ def search(query, restaurants):
         for j in restaurant_categories(i):
             if query == j:
                 result_of_query.append(i)
-                
+
     return result_of_query
 
 
